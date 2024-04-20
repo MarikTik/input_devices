@@ -27,9 +27,10 @@ Here is a simple example of how to use input_devices to listen for inputs from a
 from src.xbox_controller import XboxControllerGen4
 from inputs import get_gamepad
 
+#event subscription example
 controller = XboxControllerGen4(get_gamepad())
 controller.A.on_press(lambda: print("A pressed")) \
-          .on_release(lambda: print("A released"), lambda: print("A released x2")) # multiple subscribers available
+          .on_release(lambda: print("A released"), lambda: print("A released x2")) 
 
 controller.directional_pad.up.on_press(lambda: print("D-pad up")) # interaction with different types of buttons
 
