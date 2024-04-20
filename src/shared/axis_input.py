@@ -83,6 +83,10 @@ class VerticalAxisInput:
         self.__value_range = value_range
         self.__y: float = 0.0
     
+    def _set_y(self, y: number_t) -> None:
+        """Internal method to set the y value directly."""
+        self.__y = y
+        
     def get_y(self) -> number_t:
         """
         Get the current vertical axis value, considering whether it is inverted.
