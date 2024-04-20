@@ -30,6 +30,7 @@ class XboxControllerGen4:
         self.right_stick = AxisTrigger(vertical_axis_inverted=True)
         self.left_trigger = VerticalAxisInput(blindspot_range=(0, 0), custom_bounds=(0, 1023))  # no blindspot, representing pressure-sensitive input
         self.right_trigger = VerticalAxisInput(blindspot_range=(0, 0), custom_bounds=(0, 1023))  # same as left trigger
+        self.__gamepad = gamepad
 
     def update(self) -> None:
         """
