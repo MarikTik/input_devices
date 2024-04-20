@@ -12,7 +12,7 @@ class HorizontalAxisInput:
         self.__x = x
 
     def get_x(self) -> number_t:
-        return -self.__x if self.__axis_inverted else self._x
+        return -self.__x if self.__axis_inverted else self.__x
     
     def get_adjusted_x(self, axis_blindspot_range: range_t, axis_zero: number_t) -> number_t:
         adjusted_value = range_fit(self.__x, axis_blindspot_range, self.__value_range, axis_zero)
