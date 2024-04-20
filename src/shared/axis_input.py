@@ -1,5 +1,5 @@
 from typing import Tuple
-from ..utils.functions import map, range_fit
+from ..utils.functions import map, range_adjust
 from ..utils.type_hints import number_t, range_t
 
 class HorizontalAxisInput:
@@ -33,7 +33,7 @@ class HorizontalAxisInput:
         Returns:
             number_t: The adjusted horizontal axis value.
         """
-        adjusted_value = range_fit(self.__x, axis_blindspot_range, self.__value_range, axis_zero)
+        adjusted_value = range_adjust(self.__x, axis_blindspot_range, self.__value_range, axis_zero)
         return -adjusted_value if self.__axis_inverted else adjusted_value
     
     def get_mapped_x(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
@@ -86,7 +86,7 @@ class VerticalAxisInput:
     def _set_y(self, y: number_t) -> None:
         """Internal method to set the y value directly."""
         self.__y = y
-        
+
     def get_y(self) -> number_t:
         """
         Get the current vertical axis value, considering whether it is inverted.
@@ -107,7 +107,7 @@ class VerticalAxisInput:
         Returns:
             number_t: The adjusted vertical axis value.
         """
-        adjusted_value = range_fit(self.__y, axis_blindspot_range, self.__value_range, axis_zero)
+        adjusted_value = range_adjust(self.__y, axis_blindspot_range, self.__value_range, axis_zero)
         return -adjusted_value if self.__axis_inverted else adjusted_value
     
     def get_mapped_y(self, new_minimum: number_t, new_maximum: number_t) -> number_t:

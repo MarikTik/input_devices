@@ -4,7 +4,7 @@ def map(value: number_t, from_low: number_t, from_high: number_t, to_low: number
     return (value - from_low) * (to_high - to_low) / (from_high - from_low) + to_low
 
 
-def range_fit(value, blindspot_range: range_t, bounds: range_t, zero: number_t = None) -> number_t:
+def range_adjust(value, blindspot_range: range_t, bounds: range_t, zero: number_t = None) -> number_t:
      if zero is None:
             zero = (bounds[0] + bounds[1]) / 2
 
