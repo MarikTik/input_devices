@@ -2,11 +2,8 @@ from typing import Tuple
 from ..utils.functions import map, range_fit
 from ..utils.type_hints import number_t, range_t
 
- 
- 
-
 class HorizontalAxisInput:
-    def __init__(self, value_range: Tuple[number_t, number_t], axis_inverted: bool = False) -> None:
+    def __init__(self, value_range: range_t, axis_inverted: bool = False) -> None:
         self.__axis_inverted = axis_inverted
         self.__value_range = value_range
         self.__x: float = 0.0
@@ -32,7 +29,7 @@ class HorizontalAxisInput:
     
 
 class VerticalAxisInput:
-    def __init__(self, value_range: Tuple[number_t, number_t], axis_inverted: bool = False) -> None:
+    def __init__(self, value_range: range_t, axis_inverted: bool = False) -> None:
         self.__axis_inverted = axis_inverted
         self.__value_range = value_range
         self.__y: float = 0.0
@@ -56,8 +53,8 @@ class VerticalAxisInput:
 
 class CartesianAxisInput(HorizontalAxisInput, VerticalAxisInput):
     def __init__(self, 
-                 horizontal_value_range: Tuple[number_t, number_t],
-                 vertical_value_range: Tuple[number_t, number_t],
+                 horizontal_value_range: range_t,
+                 vertical_value_range: range_t,
                  horizontal_axis_inverted: bool = False, 
                  vertical_axis_inverted: bool = False) -> None:
         HorizontalAxisInput.__init__(self, axis_inverted=horizontal_axis_inverted, value_range=horizontal_value_range)
