@@ -1,6 +1,4 @@
 from inputs import get_gamepad
-
-
 from ..shared import Button, DirectionalPad, CartesianAxisInput, VerticalAxisInput, AxisTrigger
 
 class XboxControllerGen4:
@@ -11,14 +9,13 @@ class XboxControllerGen4:
 
     bumper_debounce_time = 0.07  # Debounce time for bumper buttons in seconds.
 
-    def __init__(self, gamepad) -> None:
+    def __init__(self, gamepad=get_gamepad()) -> None:
         """
         Initializes an XboxController instance linked to a specific gamepad device.
 
         Args:
             gamepad: The gamepad device interface from the 'inputs' library, which reads raw input events.
         """
-        self.__gamepad = gamepad
         self.A = Button()
         self.B = Button()
         self.X = Button()
