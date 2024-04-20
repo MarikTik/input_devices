@@ -3,258 +3,286 @@ from ..utils.functions import map, range_fit
 from ..utils.type_hints import number_t, range_t
 
 default_blindspot_range = (-3000, 3000)
-default_bounds = (-32768, 32767)
+default_value_range = (-32768, 32767)
 zero = 0
  
+
 class HorizontalAxisInput:
-    """Handles the horizontal axis input settings for a controller."""
+    def __init__(self, axis_inverted: bool = False, value_range: Tuple[number_t, number_t]= default_value_range) -> None:
+        self.__axis_inverted = axis_inverted
+        self.__value_range = value_range
+        self.__x: float = 0.0
 
-    def __init__(self,
-                 blindspot_range: range_t = (-3000, 3000),
-                 custom_bounds: range_t = (-32768, 32767),
-                 zero: number_t = 0,
-                 axis_inverted: bool = False) -> None:
-        """
-        Initialize the horizontal axis input configuration.
-
-        Args:
-            blindspot_range (range_t): The range within which the axis input is ignored.
-            custom_bounds (range_t): The full range of axis values.
-            zero (number_t): The value that represents zero input.
-            axis_inverted (bool): If True, inverts the axis values.
-        """
-        self._horizontal_blindspot_range = blindspot_range
-        self._horizontal_custom_bounds = custom_bounds
-        self._horizontal_zero = zero
-        self._horizontal_inverted = axis_inverted
-        self._x = zero
-
-    def set_horizontal_blindspot_range(self, blindspot_range: range_t) -> 'HorizontalAxisInput':
-        """
-        Set the horizontal axis blindspot range.
-
-        Args:
-            blindspot_range (range_t): The range within which the axis input is ignored.
-
-        Returns:
-            HorizontalAxisInput: An instance of this class.
-        """
-        self._horizontal_blindspot_range = blindspot_range
-        return self
-
-    def set_horizontal_custom_bounds(self, custom_bounds: range_t) -> 'HorizontalAxisInput':
-        """
-        Set the custom bounds for the horizontal axis.
-
-        Args:
-            custom_bounds (range_t): The full range of axis values.
-
-        Returns:
-            HorizontalAxisInput: An instance of this class.
-        """
-        self._horizontal_custom_bounds = custom_bounds
-        return self
-
-    def set_horizontal_zero(self, zero: number_t) -> 'HorizontalAxisInput':
-        """
-        Set the zero point for the horizontal axis.
-
-        Args:
-            zero (number_t): The value that represents zero input.
-
-        Returns:
-            HorizontalAxisInput: An instance of this class.
-        """
-        self._horizontal_zero = zero
-        return self
-
-    def set_horizontal_axis_inverted(self, axis_inverted: bool) -> 'HorizontalAxisInput':
-        """
-        Set whether the horizontal axis is inverted.
-
-        Args:
-            axis_inverted (bool): If True, inverts the axis values.
-
-        Returns:
-            HorizontalAxisInput: An instance of this class.
-        """
-        self._horizontal_inverted = axis_inverted
-        return self
+    def _set_x(self, x: number_t) -> None:
+        self.__x = x
 
     def get_x(self) -> number_t:
-        """
-        Get the current horizontal axis value, considering whether it is inverted.
+        return -self._x if self.__axis_inverted else self._x
+    
+    def get_adjusted_x(self, axis_blindspot_range: range_t, axis_zero: number_t) -> number_t:
+        adjusted_value = range_fit(self.__x, axis_blindspot_range, self.__value_range, axis_zero)
+        return -adjusted_value if self.__axis_inverted else adjusted_value
+    
+    def get_mapped_x(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
+        mapped_value = map(self._x, self.__value_range[0], self.__value_range[1], new_minimum, new_maximum)
+        return -mapped_value if self.__axis_inverted else mapped_value
 
-        Returns:
-            number_t: The current horizontal axis value.
-        """
-        return -self._x if self._horizontal_inverted else self._x
+    
+    def get_calibrated_x(self, axis_blindspot_range: range_t, axis_zero: number_t, new_minimum: number_t, new_maximum: number_t) -> number_t:
+        adjusted_value = self.get_adjusted_x(axis_blindspot_range, axis_zero)
+        mapped_value = map(adjusted_value, self.__value_range[0], self.__value_range[1], new_minimum, new_maximum)
+        return -mapped_value if self.__axis_inverted else mapped_value
+    
+    
+# class HorizontalAxisInput:
+#     """Handles the horizontal axis input settings for a controller."""
 
-    def get_x_adjusted(self) -> number_t:
-        """
-        Get the adjusted horizontal axis value, applying the blindspot and custom bounds.
+#     def __init__(self,
+#                  blindspot_range: range_t = (-3000, 3000),
+#                  custom_bounds: range_t = (-32768, 32767),
+#                  zero: number_t = 0,
+#                  axis_inverted: bool = False) -> None:
+#         """
+#         Initialize the horizontal axis input configuration.
 
-        Returns:
-            number_t: The adjusted horizontal axis value.
-        """
-        value = range_fit(self._x, self._horizontal_blindspot_range, self._horizontal_custom_bounds, self._horizontal_zero)
-        return -value if self._horizontal_inverted else value
+#         Args:
+#             blindspot_range (range_t): The range within which the axis input is ignored.
+#             custom_bounds (range_t): The full range of axis values.
+#             zero (number_t): The value that represents zero input.
+#             axis_inverted (bool): If True, inverts the axis values.
+#         """
+#         self._horizontal_blindspot_range = blindspot_range
+#         self._horizontal_custom_bounds = custom_bounds
+#         self._horizontal_zero = zero
+#         self._horizontal_inverted = axis_inverted
+#         self._x = zero
 
-    def get_x_bounded(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
-        """
-        Convert the adjusted horizontal axis value to a new range.
+#     def set_horizontal_blindspot_range(self, blindspot_range: range_t) -> 'HorizontalAxisInput':
+#         """
+#         Set the horizontal axis blindspot range.
 
-        Args:
-            new_minimum (number_t): The lower bound of the new range.
-            new_maximum (number_t): The upper bound of the new range.
+#         Args:
+#             blindspot_range (range_t): The range within which the axis input is ignored.
 
-        Returns:
-            number_t: The horizontal axis value mapped to the new range.
-        """
-        return map(self.get_x_adjusted(), self._horizontal_custom_bounds[0], self._horizontal_custom_bounds[1], new_minimum, new_maximum)
+#         Returns:
+#             HorizontalAxisInput: An instance of this class.
+#         """
+#         self._horizontal_blindspot_range = blindspot_range
+#         return self
 
-class VerticalAxisInput:
-    """Handles the vertical axis input settings for an Xbox controller."""
+#     def set_horizontal_custom_bounds(self, custom_bounds: range_t) -> 'HorizontalAxisInput':
+#         """
+#         Set the custom bounds for the horizontal axis.
 
-    def __init__(self,
-                 blindspot_range: range_t = (-3000, 3000), 
-                 custom_bounds: range_t = (-32768, 32767),
-                 axis_inverted: bool = False,
-                 zero: number_t = 0) -> None:
-        """
-        Initialize the vertical axis input configuration.
+#         Args:
+#             custom_bounds (range_t): The full range of axis values.
 
-        Args:
-            blindspot_range (range_t): The range within which the axis input is ignored.
-            custom_bounds (range_t): The full range of axis values.
-            axis_inverted (bool): If True, inverts the axis values.
-            zero (number_t): The value that represents zero input.
-        """
-        self._vertical_blindspot_range = blindspot_range
-        self._vertical_custom_bounds = custom_bounds
-        self._vertical_inverted = axis_inverted
-        self._vertical_zero = zero
-        self._y = float()
+#         Returns:
+#             HorizontalAxisInput: An instance of this class.
+#         """
+#         self._horizontal_custom_bounds = custom_bounds
+#         return self
 
-    def set_vertical_blindspot_range(self, blindspot_range: range_t) -> 'VerticalAxisInput':
-        """
-        Set the vertical axis blindspot range.
+#     def set_horizontal_zero(self, zero: number_t) -> 'HorizontalAxisInput':
+#         """
+#         Set the zero point for the horizontal axis.
 
-        Args:
-            blindspot_range (range_t): The range within which the axis input is ignored.
+#         Args:
+#             zero (number_t): The value that represents zero input.
 
-        Returns:
-            VerticalAxisInput: An instance of this class.
-        """
-        self._vertical_blindspot_range = blindspot_range
-        return self
+#         Returns:
+#             HorizontalAxisInput: An instance of this class.
+#         """
+#         self._horizontal_zero = zero
+#         return self
 
-    def set_vertical_custom_bounds(self, custom_bounds: range_t) -> 'VerticalAxisInput':
-        """
-        Set the custom bounds for the vertical axis.
+#     def set_horizontal_axis_inverted(self, axis_inverted: bool) -> 'HorizontalAxisInput':
+#         """
+#         Set whether the horizontal axis is inverted.
 
-        Args:
-            custom_bounds (range_t): The full range of axis values.
+#         Args:
+#             axis_inverted (bool): If True, inverts the axis values.
 
-        Returns:
-            VerticalAxisInput: An instance of this class.
-        """
-        self._vertical_custom_bounds = custom_bounds
-        return self
+#         Returns:
+#             HorizontalAxisInput: An instance of this class.
+#         """
+#         self._horizontal_inverted = axis_inverted
+#         return self
 
-    def set_vertical_axis_inverted(self, axis_inverted: bool) -> 'VerticalAxisInput':
-        """
-        Set whether the vertical axis is inverted.
+#     def get_x(self) -> number_t:
+#         """
+#         Get the current horizontal axis value, considering whether it is inverted.
 
-        Args:
-            axis_inverted (bool): If True, inverts the axis values.
+#         Returns:
+#             number_t: The current horizontal axis value.
+#         """
+#         return -self._x if self._horizontal_inverted else self._x
 
-        Returns:
-            VerticalAxisInput: An instance of this class.
-        """
-        self._vertical_inverted = axis_inverted
-        return self
+#     def get_x_adjusted(self) -> number_t:
+#         """
+#         Get the adjusted horizontal axis value, applying the blindspot and custom bounds.
 
-    def set_vertical_zero(self, zero: number_t) -> 'VerticalAxisInput':
-        """
-        Set the zero point for the vertical axis.
+#         Returns:
+#             number_t: The adjusted horizontal axis value.
+#         """
+#         value = range_fit(self._x, self._horizontal_blindspot_range, self._horizontal_custom_bounds, self._horizontal_zero)
+#         return -value if self._horizontal_inverted else value
 
-        Args:
-            zero (number_t): The value that represents zero input.
+#     def get_x_bounded(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
+#         """
+#         Convert the adjusted horizontal axis value to a new range.
 
-        Returns:
-            VerticalAxisInput: An instance of this class.
-        """
-        self._vertical_zero = zero
-        return self
+#         Args:
+#             new_minimum (number_t): The lower bound of the new range.
+#             new_maximum (number_t): The upper bound of the new range.
 
-    def get_y(self) -> number_t:
-        """
-        Get the current vertical axis value, considering whether it is inverted.
+#         Returns:
+#             number_t: The horizontal axis value mapped to the new range.
+#         """
+#         return map(self.get_x_adjusted(), self._horizontal_custom_bounds[0], self._horizontal_custom_bounds[1], new_minimum, new_maximum)
 
-        Returns:
-            number_t: The current vertical axis value.
-        """
-        return -self._y if self._vertical_inverted else self._y
+# class VerticalAxisInput:
+#     """Handles the vertical axis input settings for an Xbox controller."""
 
-    def get_y_adjusted(self) -> number_t:
-        """
-        Get the adjusted vertical axis value, applying the blindspot and custom bounds.
+#     def __init__(self,
+#                  blindspot_range: range_t = (-3000, 3000), 
+#                  custom_bounds: range_t = (-32768, 32767),
+#                  axis_inverted: bool = False,
+#                  zero: number_t = 0) -> None:
+#         """
+#         Initialize the vertical axis input configuration.
 
-        Returns:
-            number_t: The adjusted vertical axis value.
-        """
-        value = range_fit(self._y, self._vertical_blindspot_range, self._vertical_custom_bounds, self._vertical_zero)
-        return -value if self._vertical_inverted else value
+#         Args:
+#             blindspot_range (range_t): The range within which the axis input is ignored.
+#             custom_bounds (range_t): The full range of axis values.
+#             axis_inverted (bool): If True, inverts the axis values.
+#             zero (number_t): The value that represents zero input.
+#         """
+#         self._vertical_blindspot_range = blindspot_range
+#         self._vertical_custom_bounds = custom_bounds
+#         self._vertical_inverted = axis_inverted
+#         self._vertical_zero = zero
+#         self._y = float()
 
-    def get_y_bounded(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
-        """
-        Convert the adjusted vertical axis value to a new range.
+#     def set_vertical_blindspot_range(self, blindspot_range: range_t) -> 'VerticalAxisInput':
+#         """
+#         Set the vertical axis blindspot range.
 
-        Args:
-            new_minimum (number_t): The lower bound of the new range.
-            new_maximum (number_t): The upper bound of the new range.
+#         Args:
+#             blindspot_range (range_t): The range within which the axis input is ignored.
 
-        Returns:
-            number_t: The vertical axis value mapped to the new range.
-        """
-        return map(self.get_y_adjusted(), self._vertical_custom_bounds[0], self._vertical_custom_bounds[1], new_minimum, new_maximum)
+#         Returns:
+#             VerticalAxisInput: An instance of this class.
+#         """
+#         self._vertical_blindspot_range = blindspot_range
+#         return self
 
-class CartesianAxisInput(HorizontalAxisInput, VerticalAxisInput):
-     """Handles combined horizontal and vertical axis inputs for a controller."""
-     def __init__(self, 
-                  horizontal_blindspot_range: range_t = default_blindspot_range,
-                  vertical_blindspot_range: range_t = default_blindspot_range,
-                  horizontal_custom_bounds: range_t = default_bounds,
-                  vertical_custom_bounds: range_t = default_bounds,
-                  horizontal_axis_inverted: bool = False,
-                  vertical_axis_inverted: bool = False,
-                  horizontal_zero: number_t = zero,
-                  vertical_zero: number_t = zero
-                  ) -> None:
-          """
-             Initialize the Cartesian axis input configuration for managing two-dimensional control inputs.
+#     def set_vertical_custom_bounds(self, custom_bounds: range_t) -> 'VerticalAxisInput':
+#         """
+#         Set the custom bounds for the vertical axis.
+
+#         Args:
+#             custom_bounds (range_t): The full range of axis values.
+
+#         Returns:
+#             VerticalAxisInput: An instance of this class.
+#         """
+#         self._vertical_custom_bounds = custom_bounds
+#         return self
+
+#     def set_vertical_axis_inverted(self, axis_inverted: bool) -> 'VerticalAxisInput':
+#         """
+#         Set whether the vertical axis is inverted.
+
+#         Args:
+#             axis_inverted (bool): If True, inverts the axis values.
+
+#         Returns:
+#             VerticalAxisInput: An instance of this class.
+#         """
+#         self._vertical_inverted = axis_inverted
+#         return self
+
+#     def set_vertical_zero(self, zero: number_t) -> 'VerticalAxisInput':
+#         """
+#         Set the zero point for the vertical axis.
+
+#         Args:
+#             zero (number_t): The value that represents zero input.
+
+#         Returns:
+#             VerticalAxisInput: An instance of this class.
+#         """
+#         self._vertical_zero = zero
+#         return self
+
+#     def get_y(self) -> number_t:
+#         """
+#         Get the current vertical axis value, considering whether it is inverted.
+
+#         Returns:
+#             number_t: The current vertical axis value.
+#         """
+#         return -self._y if self._vertical_inverted else self._y
+
+#     def get_y_adjusted(self) -> number_t:
+#         """
+#         Get the adjusted vertical axis value, applying the blindspot and custom bounds.
+
+#         Returns:
+#             number_t: The adjusted vertical axis value.
+#         """
+#         value = range_fit(self._y, self._vertical_blindspot_range, self._vertical_custom_bounds, self._vertical_zero)
+#         return -value if self._vertical_inverted else value
+
+#     def get_y_bounded(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
+#         """
+#         Convert the adjusted vertical axis value to a new range.
+
+#         Args:
+#             new_minimum (number_t): The lower bound of the new range.
+#             new_maximum (number_t): The upper bound of the new range.
+
+#         Returns:
+#             number_t: The vertical axis value mapped to the new range.
+#         """
+#         return map(self.get_y_adjusted(), self._vertical_custom_bounds[0], self._vertical_custom_bounds[1], new_minimum, new_maximum)
+
+# class CartesianAxisInput(HorizontalAxisInput, VerticalAxisInput):
+#      """Handles combined horizontal and vertical axis inputs for a controller."""
+#      def __init__(self, 
+#                   horizontal_blindspot_range: range_t = default_blindspot_range,
+#                   vertical_blindspot_range: range_t = default_blindspot_range,
+#                   horizontal_custom_bounds: range_t = default_bounds,
+#                   vertical_custom_bounds: range_t = default_bounds,
+#                   horizontal_axis_inverted: bool = False,
+#                   vertical_axis_inverted: bool = False,
+#                   horizontal_zero: number_t = zero,
+#                   vertical_zero: number_t = zero
+#                   ) -> None:
+#           """
+#              Initialize the Cartesian axis input configuration for managing two-dimensional control inputs.
      
-             Args:
-                 horizontal_blindspot_range (range_t): The horizontal axis range within which the input is ignored.
-                 vertical_blindspot_range (range_t): The vertical axis range within which the input is ignored.
-                 horizontal_custom_bounds (range_t): The full range of horizontal axis values.
-                 vertical_custom_bounds (range_t): The full range of vertical axis values.
-                 horizontal_axis_inverted (bool): If True, inverts the horizontal axis values.
-                 vertical_axis_inverted (bool): If True, inverts the vertical axis values.
-                 horizontal_zero (number_t): The value that represents zero input for the horizontal axis.
-                 vertical_zero (number_t): The value that represents zero input for the vertical axis.
+#              Args:
+#                  horizontal_blindspot_range (range_t): The horizontal axis range within which the input is ignored.
+#                  vertical_blindspot_range (range_t): The vertical axis range within which the input is ignored.
+#                  horizontal_custom_bounds (range_t): The full range of horizontal axis values.
+#                  vertical_custom_bounds (range_t): The full range of vertical axis values.
+#                  horizontal_axis_inverted (bool): If True, inverts the horizontal axis values.
+#                  vertical_axis_inverted (bool): If True, inverts the vertical axis values.
+#                  horizontal_zero (number_t): The value that represents zero input for the horizontal axis.
+#                  vertical_zero (number_t): The value that represents zero input for the vertical axis.
      
-             Initializes a two-axis controller setup where each axis can be individually configured for blind spots, 
-             bounds, zero points, and inversion, enabling precise control over input handling.
-          """
-          HorizontalAxisInput.__init__(self, 
-                                       blindspot_range=horizontal_blindspot_range,
-                                       custom_bounds=horizontal_custom_bounds, 
-                                       axis_inverted=horizontal_axis_inverted,
-                                       zero=horizontal_zero)
-          VerticalAxisInput.__init__(self, 
-                                     blindspot_range=vertical_blindspot_range,
-                                     custom_bounds=vertical_custom_bounds,
-                                     axis_inverted=vertical_axis_inverted,
-                                     zero=vertical_zero)
+#              Initializes a two-axis controller setup where each axis can be individually configured for blind spots, 
+#              bounds, zero points, and inversion, enabling precise control over input handling.
+#           """
+#           HorizontalAxisInput.__init__(self, 
+#                                        blindspot_range=horizontal_blindspot_range,
+#                                        custom_bounds=horizontal_custom_bounds, 
+#                                        axis_inverted=horizontal_axis_inverted,
+#                                        zero=horizontal_zero)
+#           VerticalAxisInput.__init__(self, 
+#                                      blindspot_range=vertical_blindspot_range,
+#                                      custom_bounds=vertical_custom_bounds,
+#                                      axis_inverted=vertical_axis_inverted,
+#                                      zero=vertical_zero)
