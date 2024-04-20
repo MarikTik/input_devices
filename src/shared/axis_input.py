@@ -24,16 +24,47 @@ class HorizontalAxisInput:
         return -adjusted_value if self.__axis_inverted else adjusted_value
     
     def get_mapped_x(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
-        mapped_value = map(self._x, self.__value_range[0], self.__value_range[1], new_minimum, new_maximum)
+        mapped_value = map(self._x, *self.__value_range, new_minimum, new_maximum)
         return -mapped_value if self.__axis_inverted else mapped_value
-
     
     def get_calibrated_x(self, axis_blindspot_range: range_t, axis_zero: number_t, new_minimum: number_t, new_maximum: number_t) -> number_t:
         adjusted_value = self.get_adjusted_x(axis_blindspot_range, axis_zero)
-        mapped_value = map(adjusted_value, self.__value_range[0], self.__value_range[1], new_minimum, new_maximum)
+        mapped_value = map(adjusted_value, *self.__value_range, new_minimum, new_maximum)
         return -mapped_value if self.__axis_inverted else mapped_value
     
+
+class VerticalAxisInput:
+    def __init__(self, axis_inverted: bool = False, value_range: Tuple[number_t, number_t]= default_value_range) -> None:
+        self.__axis_inverted = axis_inverted
+        self.__value_range = value_range
+        self.__y: float = 0.0
     
+    def get_y(self) -> number_t:
+        return -self.__y if self.__axis_inverted else self.__y
+    
+    def get_adjusted_y(self, axis_blindspot_range: range_t, axis_zero: number_t) -> number_t:
+        adjusted_value = range_fit(self.__y, axis_blindspot_range, self.__value_range, axis_zero)
+        return -adjusted_value if self.__axis_inverted else adjusted_value
+    
+    def get_mapped_y(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
+        mapped_value = map(self.__y, *self.__value_range, new_minimum, new_maximum)
+        return -mapped_value if self.__axis_inverted else mapped_value
+    
+    def get_calibrated_y(self, axis_blindspot_range: range_t, axis_zero: number_t, new_minimum: number_t, new_maximum: number_t) -> number_t:
+        adjusted_value = self.get_adjusted_y(axis_blindspot_range, axis_zero)
+        mapped_value = map(adjusted_value, *self.__value_range, new_minimum, new_maximum)
+        return -mapped_value if self.__axis_inverted else mapped_value
+    
+
+class CartesianAxisInput(HorizontalAxisInput, VerticalAxisInput):
+    def __init__(self, 
+                 horizontal_axis_inverted: bool = False, 
+                 vertical_axis_inverted: bool = False, 
+                 horizontal_value_range: Tuple[number_t, number_t] = default_value_range,
+                 vertical_value_range: Tuple[number_t, number_t] = default_value_range) -> None:
+        HorizontalAxisInput.__init__(self, axis_inverted=horizontal_axis_inverted, value_range=horizontal_value_range)
+        VerticalAxisInput.__init__(self, axis_inverted=vertical_axis_inverted, value_range=vertical_value_range)
+
 # class HorizontalAxisInput:
 #     """Handles the horizontal axis input settings for a controller."""
 
