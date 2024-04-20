@@ -33,8 +33,8 @@ class HorizontalAxisInput:
         Returns:
             number_t: The adjusted horizontal axis value.
         """
-        adjusted_value = range_adjust(self.__x, axis_blindspot_range, self.__value_range, axis_zero)
-        return -adjusted_value if self.__axis_inverted else adjusted_value
+        return range_adjust(self.get_x(), axis_blindspot_range, self.__value_range, axis_zero)
+      
     
     def get_mapped_x(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
         """
@@ -47,8 +47,7 @@ class HorizontalAxisInput:
         Returns:
             number_t: The horizontal axis value mapped to the new range.
         """
-        mapped_value = map(self.__x, *self.__value_range, new_minimum, new_maximum)
-        return -mapped_value if self.__axis_inverted else mapped_value
+        return map(self.get_x(), *self.__value_range, new_minimum, new_maximum)
     
     def get_calibrated_x(self, axis_blindspot_range: range_t, axis_zero: number_t, new_minimum: number_t, new_maximum: number_t) -> number_t:
         """
@@ -64,8 +63,8 @@ class HorizontalAxisInput:
             number_t: The calibrated horizontal axis value.
         """
         adjusted_value = self.get_adjusted_x(axis_blindspot_range, axis_zero)
-        mapped_value = map(adjusted_value, *self.__value_range, new_minimum, new_maximum)
-        return -mapped_value if self.__axis_inverted else mapped_value
+        return map(adjusted_value, *self.__value_range, new_minimum, new_maximum)
+         
     
 
 class VerticalAxisInput:
@@ -107,8 +106,7 @@ class VerticalAxisInput:
         Returns:
             number_t: The adjusted vertical axis value.
         """
-        adjusted_value = range_adjust(self.__y, axis_blindspot_range, self.__value_range, axis_zero)
-        return -adjusted_value if self.__axis_inverted else adjusted_value
+        return range_adjust(self.get_y(), axis_blindspot_range, self.__value_range, axis_zero)
     
     def get_mapped_y(self, new_minimum: number_t, new_maximum: number_t) -> number_t:
         """
@@ -121,8 +119,7 @@ class VerticalAxisInput:
         Returns:
             number_t: The vertical axis value mapped to the new range.
         """
-        mapped_value = map(self.__y, *self.__value_range, new_minimum, new_maximum)
-        return -mapped_value if self.__axis_inverted else mapped_value
+        return map(self.get_y(), *self.__value_range, new_minimum, new_maximum)
     
     def get_calibrated_y(self, axis_blindspot_range: range_t, axis_zero: number_t, new_minimum: number_t, new_maximum: number_t) -> number_t:
         """
@@ -138,9 +135,8 @@ class VerticalAxisInput:
             number_t: The calibrated vertical axis value.
         """
         adjusted_value = self.get_adjusted_y(axis_blindspot_range, axis_zero)
-        mapped_value = map(adjusted_value, *self.__value_range, new_minimum, new_maximum)
-        return -mapped_value if self.__axis_inverted else mapped_value
-    
+        return map(adjusted_value, *self.__value_range, new_minimum, new_maximum)
+      
 
 class CartesianAxisInput(HorizontalAxisInput, VerticalAxisInput):
     """Handles combined horizontal and vertical axis inputs for a controller."""
