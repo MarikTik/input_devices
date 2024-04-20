@@ -42,7 +42,7 @@ while True:
      print(controller.left_stick.get_mapped_x(), new_minimum=-1, new_maximum=1) 
      # getting raw y values from left trigger on the xbox controller
      print(controller.left_trigger.get_y()) # get pressure-sensitive input
-```
+``
 
 Documentation
 
