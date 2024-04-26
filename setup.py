@@ -24,6 +24,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
     ],
-    zip_safe=False
+    zip_safe=False,
     package_dir={'': 'src'}
 )
