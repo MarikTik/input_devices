@@ -4,7 +4,10 @@
 
 ## Features
 
-- **Game Controllers**: Support for Xbox and PlayStation controllers.
+- **Game Controllers**: Support for Xbox Gen4 controllers.
+
+## Future
+
 - **Joysticks**: Compatibility with various models of joysticks.
 - **Remote Controllers**: Integration with different types of remote control devices.
 - **Computer Peripherals**: Support for keyboards and mice, facilitating complex input handling.
