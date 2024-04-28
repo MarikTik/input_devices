@@ -5,7 +5,7 @@ set -e
 
 # Define the package name and new version
 PACKAGE_NAME="input_devices"
-NEW_VERSION="0.1.1" # Increment this each time
+NEW_VERSION="0.1.2" # Increment this each time
 
 # Navigate to the project root
 cd /home/mark/Desktop/Projects/input_devices
